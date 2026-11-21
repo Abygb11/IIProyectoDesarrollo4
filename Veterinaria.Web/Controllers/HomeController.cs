@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Veterinaria.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Veterinaria.Web.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
     public IActionResult Index()
