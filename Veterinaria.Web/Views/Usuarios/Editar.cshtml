@@ -1,0 +1,14 @@
+@using Veterinaria.Web.ViewModels
+@model UsuarioFormViewModel
+@{
+    ViewData["Title"] = "Editar usuario";
+    ViewData["EsNuevo"] = false;
+}
+
+<h2 class="mb-3">Editar usuario</h2>
+
+<form asp-action="Editar" asp-route-id="@Model.Id" method="post" class="col-md-6">
+    <partial name="_Form" />
+    <button class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

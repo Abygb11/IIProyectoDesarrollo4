@@ -1,0 +1,88 @@
+@using System.Security.Claims
+@model List<Usuario>
+@{
+    ViewData["Title"] = "Usuarios";
+    var yo = User.FindFirstValue(ClaimTypes.NameIdentifier);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Usuarios</h2>
+    <a class="btn btn-primary" asp-action="Crear">Nuevo usuario</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input name="q" value="@ViewBag.Q" class="form-control" placeholder="Cédula, nombre o correo" />
+    </div>
+    <div class="col-auto">
+        <select name="perfil" class="form-select" asp-items="ViewBag.Perfiles">
+            <option value="">Todos los perfiles</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary">Buscar</button>
+        <a asp-action="Index" class="btn btn-link">Limpiar</a>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Cédula</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Perfil</th>
+                <th>Veterinario vinculado</th>
+                <th>Estado</th>
+                <th class="text-end">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                var esYo = u.Id.ToString() == yo;
+                <tr>
+                    <td>@u.Cedula</td>
+                    <td>@u.Nombre @(esYo ? "(usted)" : "")</td>
+                    <td>@u.Correo</td>
+                    <td>
+                        <span class="badge @(u.Perfil == Perfil.Administrador ? "bg-dark" : u.Perfil == Perfil.Veterinario ? "bg-primary" : "bg-secondary")">
+                            @(u.Perfil == Perfil.Dueno ? "Dueño" : u.Perfil.ToString())
+                        </span>
+                    </td>
+                    <td>@(u.Veterinario?.NombreCompleto ?? "—")</td>
+                    <td>
+                        @if (u.Bloqueado)
+                        {
+                            <span class="badge bg-danger">Bloqueado</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Editar" asp-route-id="@u.Id">Editar</a>
+                        @if (!esYo)
+                        {
+                            <form asp-action="CambiarBloqueo" asp-route-id="@u.Id" method="post" class="d-inline">
+                                <button class="btn btn-sm @(u.Bloqueado ? "btn-outline-success" : "btn-outline-warning")">
+                                    @(u.Bloqueado ? "Desbloquear" : "Bloquear")
+                                </button>
+                            </form>
+                            <form asp-action="Eliminar" asp-route-id="@u.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('¿Eliminar este usuario?');">
+                                <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="7" class="text-center text-muted">No hay usuarios registrados.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
