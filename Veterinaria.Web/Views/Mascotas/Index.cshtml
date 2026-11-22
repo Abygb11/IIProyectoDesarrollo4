@@ -1,4 +1,4 @@
-@* muestra el listado de mascotas ordenado por última atención,
+@* muestra el buscador y el listado de mascotas ordenado por última atención,
    con foto, especie, raza, dueño y enlace a su expediente. *@
 @model List<Veterinaria.Web.Models.Mascota>
 @{ ViewData["Title"] = "Mascotas"; }
@@ -6,6 +6,16 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="mb-0">Mascotas</h2>
 </div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-5">
+    <input name="q" value="@ViewBag.Q" class="form-control" placeholder="Nombre de la mascota o cédula del dueño" />
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-outline-secondary">Buscar</button>
+    <a asp-action="Index" class="btn btn-link">Limpiar</a>
+  </div>
+</form>
 
 <table class="table table-striped align-middle">
   <thead>
@@ -53,7 +63,7 @@
   }
   @if (!Model.Any())
   {
-    <tr><td colspan="6" class="text-muted text-center">No hay mascotas registradas.</td></tr>
+    <tr><td colspan="6" class="text-muted text-center">No se encontraron mascotas.</td></tr>
   }
   </tbody>
 </table>
