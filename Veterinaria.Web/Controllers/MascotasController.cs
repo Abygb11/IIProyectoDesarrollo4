@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Veterinaria.Web.Data;
+using Veterinaria.Web.ViewModels;
 
 namespace Veterinaria.Web.Controllers;
 
@@ -42,5 +43,45 @@ public class MascotasController : Controller
             .ToListAsync();
 
         return View(mascotas);
+    }
+
+    // Muestra el expediente de la mascota: datos generales y pestañas con vacunas,
+    // medicamentos y tratamientos, exámenes e historial clínico.
+    // La ruta es /Mascotas/Expediente/{id}.
+    public async Task<IActionResult> Expediente(int id)
+    {
+        var mascota = await _db.Mascotas
+            .Include(m => m.Especie)
+            .Include(m => m.Raza)
+            .Include(m => m.Dueno)
+            .FirstOrDefaultAsync(m => m.Id == id);
+        if (mascota == null) return NotFound();
+
+        var items = await _db.MascotaItems
+            .Include(i => i.ItemClinico)
+            .Include(i => i.AutorInicio)
+            .Include(i => i.AutorSuspension)
+            .Where(i => i.MascotaId == id)
+            .OrderByDescending(i => i.FechaInicio)
+            .ToListAsync();
+
+        var vm = new MascotaExpedienteVM
+        {
+            Mascota = mascota,
+            Vacunas = await _db.Vacunas
+                .Include(v => v.Autor)
+                .Where(v => v.MascotaId == id)
+                .OrderByDescending(v => v.FechaAplicacion)
+                .ToListAsync(),
+            Vigentes = items.Where(i => i.FechaSuspension == null).ToList(),
+            Suspendidos = items.Where(i => i.FechaSuspension != null).ToList(),
+            Examenes = await _db.Examenes
+                .Include(e => e.Autor)
+                .Where(e => e.MascotaId == id)
+                .OrderByDescending(e => e.FechaRegistro)
+                .ToListAsync()
+        };
+
+        return View(vm);
     }
 }
