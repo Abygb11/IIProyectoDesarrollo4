@@ -1,0 +1,63 @@
+@*  muestra el formulario para registrar una vacuna y el listado de vacunas aplicadas,
+             con el veterinario que las registró. Marca como "Vencida" la que ya pasó su próxima dosis. *@
+@model Veterinaria.Web.ViewModels.VacunasVM
+@{ ViewData["Title"] = "Vacunas"; }
+
+<a href="/Mascotas/Expediente/@Model.Mascota.Id" class="btn btn-link ps-0">&larr; Volver al expediente</a>
+<h2>Vacunas de @Model.Mascota.Nombre</h2>
+
+@if (TempData["Ok"] != null)
+{
+    <div class="alert alert-success">@TempData["Ok"]</div>
+}
+
+<form asp-action="Crear" method="post" class="card card-body mb-4">
+  <input type="hidden" asp-for="Form.MascotaId" />
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">Nombre de la vacuna</label>
+      <input asp-for="Form.Nombre" class="form-control" />
+      <span asp-validation-for="Form.Nombre" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Fecha de aplicación</label>
+      <input asp-for="Form.FechaAplicacion" class="form-control" />
+      <span asp-validation-for="Form.FechaAplicacion" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Próxima dosis</label>
+      <input asp-for="Form.FechaProximaDosis" class="form-control" />
+      <span asp-validation-for="Form.FechaProximaDosis" class="text-danger"></span>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button class="btn btn-primary w-100">Registrar</button>
+    </div>
+  </div>
+</form>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr><th>Vacuna</th><th>Aplicada</th><th>Próxima dosis</th><th>Registrada por</th></tr>
+  </thead>
+  <tbody>
+  @foreach (var v in Model.Vacunas)
+  {
+    <tr>
+      <td>@v.Nombre</td>
+      <td>@v.FechaAplicacion.ToString("dd/MM/yyyy")</td>
+      <td>
+        @v.FechaProximaDosis.ToString("dd/MM/yyyy")
+        @if (v.FechaProximaDosis < DateTime.Today)
+        {
+            <span class="badge bg-danger ms-1">Vencida</span>
+        }
+      </td>
+      <td>@v.Autor?.Nombre <small class="text-muted">(@v.FechaRegistro.ToString("dd/MM/yyyy HH:mm"))</small></td>
+    </tr>
+  }
+  @if (!Model.Vacunas.Any())
+  {
+    <tr><td colspan="4" class="text-muted text-center">Sin vacunas registradas.</td></tr>
+  }
+  </tbody>
+</table>
