@@ -2,13 +2,13 @@
    exámenes e historial clínico. Cada registro muestra el veterinario que lo realizó. *@
 @model Veterinaria.Web.ViewModels.MascotaExpedienteVM
 @{
-    var m = Model.Mascota;
-    ViewData["Title"] = "Expediente de " + m.Nombre;
+  var m = Model.Mascota;
+  ViewData["Title"] = "Expediente de " + m.Nombre;
 
-    // Edad aproximada en años
-    var hoy = DateTime.Today;
-    var edad = hoy.Year - m.FechaNacimiento.Year;
-    if (m.FechaNacimiento.Date > hoy.AddYears(-edad)) edad--;
+  // Edad aproximada en años
+  var hoy = DateTime.Today;
+  var edad = hoy.Year - m.FechaNacimiento.Year;
+  if (m.FechaNacimiento.Date > hoy.AddYears(-edad)) edad--;
 }
 
 <a asp-action="Index" class="btn btn-link ps-0">&larr; Volver al listado</a>
@@ -17,8 +17,8 @@
   <div class="d-flex align-items-center gap-3">
     @if (!string.IsNullOrEmpty(m.FotoRuta))
     {
-      <img src="@Url.Content("~/" + m.FotoRuta)" alt="Foto de @m.Nombre"
-           class="rounded" style="width:96px;height:96px;object-fit:cover;" />
+      <img src="@Url.Content("~/" + m.FotoRuta)" alt="Foto de @m.Nombre" class="rounded"
+           style="width:96px;height:96px;object-fit:cover;" />
     }
     else
     {
@@ -67,28 +67,35 @@
     </div>
     <table class="table table-striped align-middle">
       <thead>
-        <tr><th>Vacuna</th><th>Aplicada</th><th>Próxima dosis</th><th>Registrada por</th></tr>
+        <tr>
+          <th>Vacuna</th>
+          <th>Aplicada</th>
+          <th>Próxima dosis</th>
+          <th>Registrada por</th>
+        </tr>
       </thead>
       <tbody>
-      @foreach (var v in Model.Vacunas)
-      {
-        <tr>
-          <td>@v.Nombre</td>
-          <td>@v.FechaAplicacion.ToString("dd/MM/yyyy")</td>
-          <td>
-            @v.FechaProximaDosis.ToString("dd/MM/yyyy")
-            @if (v.FechaProximaDosis < DateTime.Today)
-            {
-              <span class="badge bg-danger ms-1">Vencida</span>
-            }
-          </td>
-          <td>@v.Autor?.Nombre</td>
-        </tr>
-      }
-      @if (!Model.Vacunas.Any())
-      {
-        <tr><td colspan="4" class="text-muted text-center">Sin vacunas registradas.</td></tr>
-      }
+        @foreach (var v in Model.Vacunas)
+        {
+          <tr>
+            <td>@v.Nombre</td>
+            <td>@v.FechaAplicacion.ToString("dd/MM/yyyy")</td>
+            <td>
+              @v.FechaProximaDosis.ToString("dd/MM/yyyy")
+              @if (v.FechaProximaDosis < DateTime.Today)
+              {
+                <span class="badge bg-danger ms-1">Vencida</span>
+              }
+            </td>
+            <td>@v.Autor?.Nombre</td>
+          </tr>
+        }
+        @if (!Model.Vacunas.Any())
+        {
+          <tr>
+            <td colspan="4" class="text-muted text-center">Sin vacunas registradas.</td>
+          </tr>
+        }
       </tbody>
     </table>
   </div>
@@ -101,70 +108,95 @@
     </div>
     <table class="table table-striped align-middle mb-4">
       <thead>
-        <tr><th>Nombre</th><th>Tipo</th><th>Inicio</th><th>Agregado por</th></tr>
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Inicio</th>
+          <th>Agregado por</th>
+        </tr>
       </thead>
       <tbody>
-      @foreach (var i in Model.Vigentes)
-      {
-        <tr>
-          <td>@i.ItemClinico?.Nombre</td>
-          <td>@i.ItemClinico?.Tipo</td>
-          <td>@i.FechaInicio.ToString("dd/MM/yyyy HH:mm")</td>
-          <td>@i.AutorInicio?.Nombre</td>
-        </tr>
-      }
-      @if (!Model.Vigentes.Any())
-      {
-        <tr><td colspan="4" class="text-muted text-center">No hay registros vigentes.</td></tr>
-      }
+        @foreach (var i in Model.Vigentes)
+        {
+          <tr>
+            <td>@i.ItemClinico?.Nombre</td>
+            <td>@i.ItemClinico?.Tipo</td>
+            <td>@i.FechaInicio.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@i.AutorInicio?.Nombre</td>
+          </tr>
+        }
+        @if (!Model.Vigentes.Any())
+        {
+          <tr>
+            <td colspan="4" class="text-muted text-center">No hay registros vigentes.</td>
+          </tr>
+        }
       </tbody>
     </table>
 
     <h5>Suspendidos</h5>
     <table class="table table-striped align-middle">
       <thead>
-        <tr><th>Nombre</th><th>Tipo</th><th>Inicio</th><th>Suspendido</th><th>Suspendido por</th></tr>
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Inicio</th>
+          <th>Suspendido</th>
+          <th>Suspendido por</th>
+        </tr>
       </thead>
       <tbody>
-      @foreach (var i in Model.Suspendidos)
-      {
-        <tr>
-          <td>@i.ItemClinico?.Nombre</td>
-          <td>@i.ItemClinico?.Tipo</td>
-          <td>@i.FechaInicio.ToString("dd/MM/yyyy")</td>
-          <td>@i.FechaSuspension?.ToString("dd/MM/yyyy HH:mm")</td>
-          <td>@i.AutorSuspension?.Nombre</td>
-        </tr>
-      }
-      @if (!Model.Suspendidos.Any())
-      {
-        <tr><td colspan="5" class="text-muted text-center">No hay registros suspendidos.</td></tr>
-      }
+        @foreach (var i in Model.Suspendidos)
+        {
+          <tr>
+            <td>@i.ItemClinico?.Nombre</td>
+            <td>@i.ItemClinico?.Tipo</td>
+            <td>@i.FechaInicio.ToString("dd/MM/yyyy")</td>
+            <td>@i.FechaSuspension?.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@i.AutorSuspension?.Nombre</td>
+          </tr>
+        }
+        @if (!Model.Suspendidos.Any())
+        {
+          <tr>
+            <td colspan="5" class="text-muted text-center">No hay registros suspendidos.</td>
+          </tr>
+        }
       </tbody>
     </table>
   </div>
 
-  @* ---------- Exámenes (la gestión la desarrolla Frank) ---------- *@
+  @* ---------- Exámenes ---------- *@
   <div class="tab-pane fade" id="tab-examenes">
-    <h5 class="mb-3">Resultados de exámenes</h5>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Resultados de exámenes</h5>
+      <a class="btn btn-primary btn-sm" href="/Examenes/Index?mascotaId=@m.Id">Registrar o ver exámenes</a>
+    </div>
     <table class="table table-striped align-middle">
       <thead>
-        <tr><th>Descripción</th><th>Archivo</th><th>Fecha</th><th>Registrado por</th></tr>
+        <tr>
+          <th>Descripción</th>
+          <th>Archivo</th>
+          <th>Fecha</th>
+          <th>Registrado por</th>
+        </tr>
       </thead>
       <tbody>
-      @foreach (var e in Model.Examenes)
-      {
-        <tr>
-          <td>@e.Descripcion</td>
-          <td>@e.NombreOriginal</td>
-          <td>@e.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
-          <td>@e.Autor?.Nombre</td>
-        </tr>
-      }
-      @if (!Model.Examenes.Any())
-      {
-        <tr><td colspan="4" class="text-muted text-center">Sin exámenes registrados.</td></tr>
-      }
+        @foreach (var e in Model.Examenes)
+        {
+          <tr>
+            <td>@e.Descripcion</td>
+            <td><a href="/Examenes/Descargar/@e.Id" target="_blank" rel="noopener">@e.NombreOriginal</a></td>
+            <td>@e.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@e.Autor?.Nombre</td>
+          </tr>
+        }
+        @if (!Model.Examenes.Any())
+        {
+          <tr>
+            <td colspan="4" class="text-muted text-center">Sin exámenes registrados.</td>
+          </tr>
+        }
       </tbody>
     </table>
   </div>
