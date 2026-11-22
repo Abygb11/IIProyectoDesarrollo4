@@ -1,0 +1,32 @@
+@model Veterinario
+@{ ViewData["Title"] = "Editar veterinario"; }
+
+<h2 class="mb-3">Editar veterinario</h2>
+
+<form asp-action="Editar" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="col-md-6">
+    <div class="mb-3">
+        <label asp-for="NombreCompleto" class="form-label">Nombre completo</label>
+        <input asp-for="NombreCompleto" class="form-control" />
+        <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="NumeroColegiado" class="form-label">Número de colegiado</label>
+        <input asp-for="NumeroColegiado" class="form-control" />
+        <span asp-validation-for="NumeroColegiado" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Fotografía</label>
+        @if (!string.IsNullOrEmpty(Model.FotoRuta))
+        {
+            <div class="mb-2">
+                <img src="@Url.Content("~/" + Model.FotoRuta)" alt="Foto actual"
+                     class="rounded" style="width:96px;height:96px;object-fit:cover;" />
+            </div>
+        }
+        <input type="file" name="foto" class="form-control" accept=".jpg,.jpeg,.png" />
+        <div class="form-text">Deje este campo vacío para conservar la foto actual.</div>
+        @Html.ValidationMessage("foto", new { @class = "text-danger" })
+    </div>
+    <button class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

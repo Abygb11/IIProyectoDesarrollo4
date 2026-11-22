@@ -14,6 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
     
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<ArchivoService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>
@@ -48,6 +49,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+    app.UseStaticFiles();   
 app.UseRouting();
 
 app.UseAuthentication(); 
