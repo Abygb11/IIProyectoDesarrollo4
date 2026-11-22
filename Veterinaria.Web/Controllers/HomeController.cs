@@ -8,8 +8,12 @@ namespace Veterinaria.Web.Controllers;
 [Authorize]
 public class HomeController : Controller
 {
+    // Veterinarios y administradores van directo al listado de mascotas al iniciar sesión.
     public IActionResult Index()
     {
+        if (User.IsInRole("Administrador") || User.IsInRole("Veterinario"))
+            return RedirectToAction("Index", "Mascotas");
+
         return View();
     }
 

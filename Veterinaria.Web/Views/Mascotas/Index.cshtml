@@ -1,0 +1,59 @@
+@* muestra el listado de mascotas ordenado por última atención,
+   con foto, especie, raza, dueño y enlace a su expediente. *@
+@model List<Veterinaria.Web.Models.Mascota>
+@{ ViewData["Title"] = "Mascotas"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Mascotas</h2>
+</div>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Nombre</th>
+      <th>Especie / Raza</th>
+      <th>Dueño</th>
+      <th>Última atención</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  @foreach (var m in Model)
+  {
+    <tr>
+      <td style="width:70px">
+        @if (!string.IsNullOrEmpty(m.FotoRuta))
+        {
+          <img src="@Url.Content("~/" + m.FotoRuta)" alt="Foto de @m.Nombre"
+               class="rounded" style="width:56px;height:56px;object-fit:cover;" />
+        }
+        else
+        {
+          <div class="rounded bg-light border" style="width:56px;height:56px;"></div>
+        }
+      </td>
+      <td>@m.Nombre</td>
+      <td>@m.Especie?.Nombre <small class="text-muted">(@m.Raza?.Nombre)</small></td>
+      <td>@m.Dueno?.Nombre <small class="text-muted">@m.Dueno?.Cedula</small></td>
+      <td>
+        @if (m.UltimaAtencion.HasValue)
+        {
+          @m.UltimaAtencion.Value.ToString("dd/MM/yyyy HH:mm")
+        }
+        else
+        {
+          <span class="text-muted">Sin atenciones</span>
+        }
+      </td>
+      <td class="text-end">
+        <a href="/Mascotas/Expediente/@m.Id" class="btn btn-sm btn-primary">Expediente</a>
+      </td>
+    </tr>
+  }
+  @if (!Model.Any())
+  {
+    <tr><td colspan="6" class="text-muted text-center">No hay mascotas registradas.</td></tr>
+  }
+  </tbody>
+</table>
