@@ -1,0 +1,19 @@
+@model Raza
+@{ ViewData["Title"] = "Editar raza"; }
+
+<h2 class="mb-3">Editar raza</h2>
+
+<form asp-action="Editar" asp-route-id="@Model.Id" method="post" class="col-md-5">
+    <div class="mb-3">
+        <label asp-for="EspecieId" class="form-label">Especie</label>
+        <select asp-for="EspecieId" class="form-select" asp-items="ViewBag.Especies"></select>
+        <span asp-validation-for="EspecieId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label">Nombre de la raza</label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <button class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
