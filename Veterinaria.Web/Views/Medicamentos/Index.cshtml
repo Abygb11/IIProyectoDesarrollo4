@@ -1,0 +1,79 @@
+@* Formulario para asignar un medicamento/tratamiento del catálogo y dos listados:
+             vigentes (con botón Suspender) y suspendidos. Muestra la autoría de cada acción. *@
+@model Veterinaria.Web.ViewModels.ItemsVM
+@{ ViewData["Title"] = "Medicamentos y tratamientos"; }
+
+<a href="/Mascotas/Expediente/@Model.Mascota.Id" class="btn btn-link ps-0">&larr; Volver al expediente</a>
+<h2>Medicamentos y tratamientos de @Model.Mascota.Nombre</h2>
+
+@if (TempData["Ok"] != null)
+{
+    <div class="alert alert-success">@TempData["Ok"]</div>
+}
+
+<form asp-action="Agregar" method="post" class="card card-body mb-4">
+  <input type="hidden" asp-for="Form.MascotaId" />
+  <div class="row g-3">
+    <div class="col-md-9">
+      <label class="form-label">Medicamento o tratamiento</label>
+      <select asp-for="Form.ItemClinicoId" class="form-select">
+        <option value="0">-- Selecciona --</option>
+        @foreach (var c in Model.Catalogo)
+        {
+            <option value="@c.Id">@c.Tipo: @c.Nombre</option>
+        }
+      </select>
+      <span asp-validation-for="Form.ItemClinicoId" class="text-danger"></span>
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+      <button class="btn btn-primary w-100">Agregar</button>
+    </div>
+  </div>
+</form>
+
+<h4>Vigentes</h4>
+<table class="table table-striped align-middle mb-4">
+  <thead><tr><th>Nombre</th><th>Tipo</th><th>Inicio</th><th>Agregado por</th><th></th></tr></thead>
+  <tbody>
+  @foreach (var i in Model.Vigentes)
+  {
+    <tr>
+      <td>@i.ItemClinico?.Nombre</td>
+      <td>@i.ItemClinico?.Tipo</td>
+      <td>@i.FechaInicio.ToString("dd/MM/yyyy HH:mm")</td>
+      <td>@i.AutorInicio?.Nombre</td>
+      <td class="text-end">
+        <form asp-action="Suspender" asp-route-id="@i.Id" method="post"
+              onsubmit="return confirm('¿Suspender este registro?');">
+          <button class="btn btn-sm btn-outline-danger">Suspender</button>
+        </form>
+      </td>
+    </tr>
+  }
+  @if (!Model.Vigentes.Any())
+  {
+    <tr><td colspan="5" class="text-muted text-center">No hay registros vigentes.</td></tr>
+  }
+  </tbody>
+</table>
+
+<h4>Suspendidos</h4>
+<table class="table table-striped align-middle">
+  <thead><tr><th>Nombre</th><th>Tipo</th><th>Inicio</th><th>Suspendido</th><th>Suspendido por</th></tr></thead>
+  <tbody>
+  @foreach (var i in Model.Suspendidos)
+  {
+    <tr>
+      <td>@i.ItemClinico?.Nombre</td>
+      <td>@i.ItemClinico?.Tipo</td>
+      <td>@i.FechaInicio.ToString("dd/MM/yyyy")</td>
+      <td>@i.FechaSuspension?.ToString("dd/MM/yyyy HH:mm")</td>
+      <td>@i.AutorSuspension?.Nombre</td>
+    </tr>
+  }
+  @if (!Model.Suspendidos.Any())
+  {
+    <tr><td colspan="5" class="text-muted text-center">No hay registros suspendidos.</td></tr>
+  }
+  </tbody>
+</table>
