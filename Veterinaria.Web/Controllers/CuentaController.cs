@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Veterinaria.Web.Data;
+using Veterinaria.Web.Models; 
+using Veterinaria.Web.ViewModels;
 
 namespace Veterinaria.Web.Controllers;
 
@@ -56,4 +58,35 @@ public class CuentaController : Controller
     }
     // Vista que se muestra cuando un usuario intenta acceder a una página para la cual no tiene permisos.
     public IActionResult Denegado() => View();
+
+    // Vista para registrar un nuevo usuario (dueño de mascota) desde la web. La app móvil no tiene registro, solo inicio de sesión.
+    [HttpGet]
+    public IActionResult Registro() => View(new RegistroVM());
+
+    // Se realiza el registro de un nuevo usuario (dueño de mascota) desde la web. La app móvil no tiene registro, solo inicio de sesión.
+    [HttpPost]
+    public async Task<IActionResult> Registro(RegistroVM vm)
+    {
+        if (await _db.Usuarios.AnyAsync(u => u.Cedula == vm.Cedula))
+            ModelState.AddModelError(nameof(vm.Cedula), "Ya existe un usuario con esa cédula.");
+        if (await _db.Usuarios.AnyAsync(u => u.Correo == vm.Correo))
+            ModelState.AddModelError(nameof(vm.Correo), "Ya existe un usuario con ese correo.");
+
+        if (!ModelState.IsValid) return View(vm);
+
+        _db.Usuarios.Add(new Usuario
+        {
+            Cedula = vm.Cedula.Trim(),
+            Nombre = vm.Nombre.Trim(),
+            Correo = vm.Correo.Trim(),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(vm.Password),
+            Perfil = Perfil.Dueno, // fijo, no viene del formulario
+            Bloqueado = false
+        });
+        await _db.SaveChangesAsync();
+
+        // TempData se usa para enviar un mensaje a la vista de Login, que se mostrará una sola vez.
+        TempData["Ok"] = "Cuenta creada. Ya puedes iniciar sesión desde la app móvil.";
+        return RedirectToAction("Login");
+    }
 }
