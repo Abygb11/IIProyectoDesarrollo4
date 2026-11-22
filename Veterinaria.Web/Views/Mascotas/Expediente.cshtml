@@ -170,7 +170,24 @@
 
   @* ---------- Historial clínico (se completa en el siguiente commit) ---------- *@
   <div class="tab-pane fade" id="tab-historial">
-    <p class="text-muted">El historial clínico estará disponible en el siguiente avance.</p>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Últimas notas</h5>
+      <a class="btn btn-primary btn-sm" href="/Notas/Index?mascotaId=@m.Id">Ver historial y agregar nota</a>
+    </div>
+    @foreach (var n in Model.Notas)
+    {
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between">
+          <span>@n.FechaHora.ToString("dd/MM/yyyy HH:mm")</span>
+          <small class="text-muted">@n.Autor?.Nombre</small>
+        </div>
+        <div class="card-body">@Html.Raw(n.ContenidoHtml)</div>
+      </div>
+    }
+    @if (!Model.Notas.Any())
+    {
+      <p class="text-muted text-center">Sin notas en el historial.</p>
+    }
   </div>
 
 </div>

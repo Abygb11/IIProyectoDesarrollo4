@@ -79,6 +79,12 @@ public class MascotasController : Controller
                 .Include(e => e.Autor)
                 .Where(e => e.MascotaId == id)
                 .OrderByDescending(e => e.FechaRegistro)
+                .ToListAsync(),
+            Notas = await _db.Notas
+                .Include(n => n.Autor)
+                .Where(n => n.MascotaId == id)
+                .OrderByDescending(n => n.FechaHora)
+                .Take(5)
                 .ToListAsync()
         };
 

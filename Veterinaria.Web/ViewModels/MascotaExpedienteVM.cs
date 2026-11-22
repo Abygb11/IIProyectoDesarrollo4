@@ -10,4 +10,5 @@ public class MascotaExpedienteVM
     public List<MascotaItem> Vigentes { get; set; } = new();
     public List<MascotaItem> Suspendidos { get; set; } = new();
     public List<Examen> Examenes { get; set; } = new();
+    public List<NotaClinica> Notas { get; set; } = new();
 }
