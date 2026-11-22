@@ -1,5 +1,6 @@
 namespace Veterinaria.Web.Dtos;
 
+// Estos DTOs se utilizan para enviar datos desde la API hacia la app móvil, y viceversa.
 public record LoginRequest(string Correo, string Password);
 public record LoginResponse(string Token, DateTime Expira, string Nombre);
 

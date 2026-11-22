@@ -15,13 +15,15 @@ public class MascotasApiController : ControllerBase
     private readonly AppDbContext _db;
     private readonly IWebHostEnvironment _env;
     public MascotasApiController(AppDbContext db, IWebHostEnvironment env) { _db = db; _env = env; }
-
+    
+    // Id del usuario sacado del token (no de la URL ni del cuerpo)
     private int UsuarioId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     // Solo devuelve la mascota si pertenece al dueño del token
     private Task<bool> EsMia(int mascotaId) =>
         _db.Mascotas.AnyAsync(m => m.Id == mascotaId && m.DuenoId == UsuarioId);
 
+    // Obtiene la lista de mascotas del dueño que inició sesión en la app móvil
     [HttpGet]
     public async Task<ActionResult<List<MascotaDto>>> Listar()
     {
@@ -33,6 +35,7 @@ public class MascotasApiController : ControllerBase
         return Ok(lista);
     }
 
+    // Obtiene la lista de vacunas de la mascota, solo si pertenece al dueño del token
     [HttpGet("{id}/vacunas")]
     public async Task<IActionResult> Vacunas(int id)
     {
@@ -48,6 +51,7 @@ public class MascotasApiController : ControllerBase
         return Ok(vacunas);
     }
 
+    // Obtiene la lista de exámenes de la mascota, solo si pertenece al dueño del token
     [HttpGet("{id}/examenes")]
     public async Task<IActionResult> Examenes(int id)
     {
@@ -61,6 +65,7 @@ public class MascotasApiController : ControllerBase
         return Ok(examenes);
     }
 
+    // Obtiene el archivo del examen, solo si pertenece a la mascota del dueño del token
     [HttpGet("{id}/examenes/{examenId}/archivo")]
     public async Task<IActionResult> Archivo(int id, int examenId)
     {
@@ -75,6 +80,8 @@ public class MascotasApiController : ControllerBase
         return PhysicalFile(ruta, ex.TipoContenido, ex.NombreOriginal);
     }
 
+    // Obtiene la foto de la mascota, solo si pertenece al dueño del token
+    // FotoRuta es relativa a wwwroot (ej. "uploads/mascotas/x.jpg")
     [HttpGet("{id}/foto")]
     public async Task<IActionResult> Foto(int id)
     {

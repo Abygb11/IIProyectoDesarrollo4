@@ -15,6 +15,7 @@ public class AuthApiController : ControllerBase
     private readonly JwtService _jwt;
     public AuthApiController(AppDbContext db, JwtService jwt) { _db = db; _jwt = jwt; }
 
+    // esto es para que la app móvil pueda iniciar sesión y obtener un token JWT que se usará en las demás llamadas a la API
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest req)
     {

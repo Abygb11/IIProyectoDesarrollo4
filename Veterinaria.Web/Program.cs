@@ -14,8 +14,10 @@ builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
     
 builder.Services.AddScoped<JwtService>();
-builder.Services.AddScoped<ArchivoService>();
+builder.Services.AddScoped<AtencionService>();
 
+//el esquema es un identificador que se le da a la autenticación, en este caso se le da el nombre Bearer,
+// que es el esquema que se usa para los tokens JWT
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>
     {

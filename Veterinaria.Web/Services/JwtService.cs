@@ -11,6 +11,8 @@ public class JwtService
     private readonly IConfiguration _config;
     public JwtService(IConfiguration config) => _config = config;
 
+    // Esto para generar el token JWT que se le entrega a la app móvil al iniciar sesión. 
+    // El token contiene el Id del usuario, su nombre y su perfil.
     public (string token, DateTime expira) Generar(Usuario u)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
@@ -24,6 +26,7 @@ public class JwtService
             new Claim(ClaimTypes.Role, u.Perfil.ToString())
         };
 
+        // Se genera el token JWT con los claims, la fecha de expiración y la firma
         var jwt = new JwtSecurityToken(
             issuer: _config["Jwt:Issuer"],
             audience: _config["Jwt:Audience"],
