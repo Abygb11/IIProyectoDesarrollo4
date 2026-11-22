@@ -1,0 +1,13 @@
+@* formulario para modificar los datos de una mascota, su foto y su dueño. *@
+@using Veterinaria.Web.ViewModels
+@model MascotaFormVM
+@{ ViewData["Title"] = "Editar mascota"; }
+
+<a href="/Mascotas/Expediente/@Model.Id" class="btn btn-link ps-0">&larr; Volver al expediente</a>
+<h2 class="mb-3">Editar mascota</h2>
+
+<form asp-action="Editar" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="col-lg-9">
+  <partial name="_Form" />
+  <button class="btn btn-primary">Guardar cambios</button>
+  <a href="/Mascotas/Expediente/@Model.Id" class="btn btn-secondary">Cancelar</a>
+</form>

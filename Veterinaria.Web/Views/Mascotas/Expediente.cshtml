@@ -29,6 +29,7 @@
       <div>@m.Especie?.Nombre &middot; @m.Raza?.Nombre &middot; @m.Sexo</div>
       <div class="text-muted">Nacimiento: @m.FechaNacimiento.ToString("dd/MM/yyyy") (@edad años)</div>
       <div class="text-muted">Dueño: @m.Dueno?.Nombre (@m.Dueno?.Cedula)</div>
+      <a href="/Mascotas/Editar/@m.Id" class="btn btn-outline-secondary btn-sm mt-2">Editar datos</a>
     </div>
   </div>
 </div>
@@ -168,7 +169,7 @@
     </table>
   </div>
 
-  @* ---------- Historial clínico (se completa en el siguiente commit) ---------- *@
+  @* ---------- Historial clínico ---------- *@
   <div class="tab-pane fade" id="tab-historial">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h5 class="mb-0">Últimas notas</h5>

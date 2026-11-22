@@ -1,0 +1,134 @@
+@* campos compartidos por Crear y Editar: datos de la mascota, foto y dueño.
+   Incluye el JavaScript que recarga las razas al cambiar la especie y que busca al dueño por cédula. *@
+@using Veterinaria.Web.ViewModels
+@model MascotaFormVM
+
+<input type="hidden" asp-for="Id" />
+<input type="hidden" asp-for="FotoRuta" />
+
+<h5>Datos de la mascota</h5>
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <label asp-for="Nombre" class="form-label">Nombre</label>
+    <input asp-for="Nombre" class="form-control" />
+    <span asp-validation-for="Nombre" class="text-danger"></span>
+  </div>
+  <div class="col-md-3">
+    <label asp-for="FechaNacimiento" class="form-label">Fecha de nacimiento</label>
+    <input asp-for="FechaNacimiento" class="form-control" />
+    <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+  </div>
+  <div class="col-md-3">
+    <label asp-for="Sexo" class="form-label">Sexo</label>
+    <select asp-for="Sexo" class="form-select" asp-items="Html.GetEnumSelectList<Sexo>()"></select>
+  </div>
+  <div class="col-md-6">
+    <label asp-for="EspecieId" class="form-label">Especie</label>
+    <select asp-for="EspecieId" class="form-select" asp-items="ViewBag.Especies">
+      <option value="0">-- Selecciona --</option>
+    </select>
+    <span asp-validation-for="EspecieId" class="text-danger"></span>
+  </div>
+  <div class="col-md-6">
+    <label asp-for="RazaId" class="form-label">Raza</label>
+    <select asp-for="RazaId" class="form-select" asp-items="ViewBag.Razas">
+      <option value="0">-- Selecciona --</option>
+    </select>
+    <span asp-validation-for="RazaId" class="text-danger"></span>
+  </div>
+  <div class="col-md-12">
+    <label asp-for="Foto" class="form-label">Fotografía (JPG o PNG, máximo 5 MB)</label>
+    <input asp-for="Foto" type="file" class="form-control" accept=".jpg,.jpeg,.png" />
+    <span asp-validation-for="Foto" class="text-danger"></span>
+    @if (!string.IsNullOrEmpty(Model.FotoRuta))
+    {
+      <div class="mt-2">
+        <img src="@Url.Content("~/" + Model.FotoRuta)" alt="Foto actual" class="rounded"
+             style="width:96px;height:96px;object-fit:cover;" />
+        <small class="text-muted ms-2">Foto actual. Sube otra para reemplazarla.</small>
+      </div>
+    }
+  </div>
+</div>
+
+<h5>Dueño</h5>
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <label asp-for="CedulaDueno" class="form-label">Cédula del dueño</label>
+    <input asp-for="CedulaDueno" class="form-control" />
+    <div id="avisoDueno" class="form-text"></div>
+    <span asp-validation-for="CedulaDueno" class="text-danger"></span>
+  </div>
+</div>
+
+<div id="grupoDuenoNuevo" class="row g-3 mb-4">
+  <div class="col-12">
+    <div class="form-text">Completa estos datos solo si la cédula no está registrada. Se crea un dueño nuevo.</div>
+  </div>
+  <div class="col-md-4">
+    <label asp-for="NombreDueno" class="form-label">Nombre del dueño</label>
+    <input asp-for="NombreDueno" class="form-control" />
+    <span asp-validation-for="NombreDueno" class="text-danger"></span>
+  </div>
+  <div class="col-md-4">
+    <label asp-for="CorreoDueno" class="form-label">Correo del dueño</label>
+    <input asp-for="CorreoDueno" type="email" class="form-control" />
+    <span asp-validation-for="CorreoDueno" class="text-danger"></span>
+  </div>
+  <div class="col-md-4">
+    <label asp-for="PasswordDueno" class="form-label">Contraseña inicial</label>
+    <input asp-for="PasswordDueno" type="password" class="form-control" autocomplete="new-password" />
+    <span asp-validation-for="PasswordDueno" class="text-danger"></span>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var especie = document.getElementById('EspecieId');
+    var raza = document.getElementById('RazaId');
+    var cedula = document.getElementById('CedulaDueno');
+    var aviso = document.getElementById('avisoDueno');
+    var grupoNuevo = document.getElementById('grupoDuenoNuevo');
+
+    // Recarga las razas cuando cambia la especie
+    especie.addEventListener('change', async function () {
+      raza.innerHTML = '<option value="0">-- Selecciona --</option>';
+      if (!especie.value || especie.value === '0') return;
+
+      var resp = await fetch('@Url.Action("RazasPorEspecie", "Mascotas")?especieId=' + especie.value);
+      var razas = await resp.json();
+      razas.forEach(function (r) {
+        var opcion = document.createElement('option');
+        opcion.value = r.id;
+        opcion.textContent = r.nombre;
+        raza.appendChild(opcion);
+      });
+    });
+
+    // Busca al dueño por cédula: si existe oculta los datos de dueño nuevo, si no, los muestra
+    async function buscarDueno() {
+      var valor = cedula.value.trim();
+      if (!valor) { aviso.textContent = ''; grupoNuevo.classList.remove('d-none'); return; }
+
+      var resp = await fetch('@Url.Action("BuscarDueno", "Mascotas")?cedula=' + encodeURIComponent(valor));
+      var d = await resp.json();
+
+      if (d.existe && d.esDueno) {
+        aviso.textContent = 'Dueño registrado: ' + d.nombre;
+        aviso.className = 'form-text text-success';
+        grupoNuevo.classList.add('d-none');
+      } else if (d.existe) {
+        aviso.textContent = 'Esa cédula pertenece a un usuario que no es dueño.';
+        aviso.className = 'form-text text-danger';
+        grupoNuevo.classList.add('d-none');
+      } else {
+        aviso.textContent = 'Cédula no registrada. Completa los datos del dueño nuevo.';
+        aviso.className = 'form-text text-muted';
+        grupoNuevo.classList.remove('d-none');
+      }
+    }
+
+    cedula.addEventListener('change', buscarDueno);
+    if (cedula.value) buscarDueno();   // al editar o al volver con errores
+  })();
+</script>

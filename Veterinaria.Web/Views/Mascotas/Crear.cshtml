@@ -1,0 +1,13 @@
+@* formulario para registrar una mascota y vincularla con su dueño. *@
+@using Veterinaria.Web.ViewModels
+@model MascotaFormVM
+@{ ViewData["Title"] = "Registrar mascota"; }
+
+<a asp-action="Index" class="btn btn-link ps-0">&larr; Volver al listado</a>
+<h2 class="mb-3">Registrar mascota</h2>
+
+<form asp-action="Crear" method="post" enctype="multipart/form-data" class="col-lg-9">
+  <partial name="_Form" />
+  <button class="btn btn-primary">Guardar</button>
+  <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
