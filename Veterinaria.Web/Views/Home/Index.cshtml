@@ -1,8 +1,46 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model List<Mascota>?
+
+@{
+    ViewData["Title"] = User.IsInRole(nameof(Perfil.Dueno)) ? "Mis mascotas" : "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (User.IsInRole(nameof(Perfil.Dueno)))
+{
+    <h1 class="mb-4">Mis mascotas</h1>
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="alert alert-info" role="status">
+            Todavía no hay mascotas registradas a tu nombre. Contacta a la veterinaria para que las registre con tu cuenta.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var mascota in Model)
+            {
+                <div class="col">
+                    <article class="card h-100 shadow-sm">
+                        @if (!string.IsNullOrWhiteSpace(mascota.FotoRuta))
+                        {
+                            <img src="~/@mascota.FotoRuta.TrimStart('/')" class="card-img-top" alt="Foto de @mascota.Nombre" style="height: 220px; object-fit: cover;" />
+                        }
+                        <div class="card-body">
+                            <h2 class="h5 card-title">@mascota.Nombre</h2>
+                            <p class="card-text mb-1"><strong>Especie:</strong> @mascota.Especie?.Nombre</p>
+                            <p class="card-text mb-1"><strong>Raza:</strong> @mascota.Raza?.Nombre</p>
+                            <p class="card-text"><strong>Sexo:</strong> @mascota.Sexo</p>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+}
+else
+{
+    <div class="text-center">
+        <h1 class="display-5">Bienvenido a la veterinaria</h1>
+        <p class="lead">Usa el menú para acceder a las opciones disponibles para tu perfil.</p>
+    </div>
+}
