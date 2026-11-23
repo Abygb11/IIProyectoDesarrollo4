@@ -1,0 +1,226 @@
+@* muestra el expediente de la mascota en pestañas: vacunas, medicamentos y tratamientos,
+   exámenes e historial clínico. Cada registro muestra el veterinario que lo realizó. *@
+@model Veterinaria.Web.ViewModels.MascotaExpedienteVM
+@{
+  var m = Model.Mascota;
+  ViewData["Title"] = "Expediente de " + m.Nombre;
+
+  // Edad aproximada en años
+  var hoy = DateTime.Today;
+  var edad = hoy.Year - m.FechaNacimiento.Year;
+  if (m.FechaNacimiento.Date > hoy.AddYears(-edad)) edad--;
+}
+
+<a asp-action="Index" class="btn btn-link ps-0">&larr; Volver al listado</a>
+
+<div class="card card-body mb-4">
+  <div class="d-flex align-items-center gap-3">
+    @if (!string.IsNullOrEmpty(m.FotoRuta))
+    {
+      <img src="@Url.Content("~/" + m.FotoRuta)" alt="Foto de @m.Nombre" class="rounded"
+           style="width:96px;height:96px;object-fit:cover;" />
+    }
+    else
+    {
+      <div class="rounded bg-light border" style="width:96px;height:96px;"></div>
+    }
+    <div>
+      <h2 class="mb-1">@m.Nombre</h2>
+      <div>@m.Especie?.Nombre &middot; @m.Raza?.Nombre &middot; @m.Sexo</div>
+      <div class="text-muted">Nacimiento: @m.FechaNacimiento.ToString("dd/MM/yyyy") (@edad años)</div>
+      <div class="text-muted">Dueño: @m.Dueno?.Nombre (@m.Dueno?.Cedula)</div>
+      <a href="/Mascotas/Editar/@m.Id" class="btn btn-outline-secondary btn-sm mt-2">Editar datos</a>
+    </div>
+  </div>
+</div>
+
+<ul class="nav nav-tabs mb-3" role="tablist">
+  <li class="nav-item">
+    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-vacunas" type="button">
+      Vacunas <span class="badge bg-secondary">@Model.Vacunas.Count</span>
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-items" type="button">
+      Medicamentos y tratamientos <span class="badge bg-secondary">@Model.Vigentes.Count</span>
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-examenes" type="button">
+      Exámenes <span class="badge bg-secondary">@Model.Examenes.Count</span>
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-historial" type="button">
+      Historial clínico
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+
+  @* ---------- Vacunas ---------- *@
+  <div class="tab-pane fade show active" id="tab-vacunas">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Vacunas aplicadas</h5>
+      <a class="btn btn-primary btn-sm" href="/Vacunas/Index?mascotaId=@m.Id">Registrar o ver vacunas</a>
+    </div>
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Vacuna</th>
+          <th>Aplicada</th>
+          <th>Próxima dosis</th>
+          <th>Registrada por</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var v in Model.Vacunas)
+        {
+          <tr>
+            <td>@v.Nombre</td>
+            <td>@v.FechaAplicacion.ToString("dd/MM/yyyy")</td>
+            <td>
+              @v.FechaProximaDosis.ToString("dd/MM/yyyy")
+              @if (v.FechaProximaDosis < DateTime.Today)
+              {
+                <span class="badge bg-danger ms-1">Vencida</span>
+              }
+            </td>
+            <td>@v.Autor?.Nombre</td>
+          </tr>
+        }
+        @if (!Model.Vacunas.Any())
+        {
+          <tr>
+            <td colspan="4" class="text-muted text-center">Sin vacunas registradas.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @* ---------- Medicamentos y tratamientos ---------- *@
+  <div class="tab-pane fade" id="tab-items">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Vigentes</h5>
+      <a class="btn btn-primary btn-sm" href="/Medicamentos/Index?mascotaId=@m.Id">Agregar o suspender</a>
+    </div>
+    <table class="table table-striped align-middle mb-4">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Inicio</th>
+          <th>Agregado por</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var i in Model.Vigentes)
+        {
+          <tr>
+            <td>@i.ItemClinico?.Nombre</td>
+            <td>@i.ItemClinico?.Tipo</td>
+            <td>@i.FechaInicio.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@i.AutorInicio?.Nombre</td>
+          </tr>
+        }
+        @if (!Model.Vigentes.Any())
+        {
+          <tr>
+            <td colspan="4" class="text-muted text-center">No hay registros vigentes.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <h5>Suspendidos</h5>
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Inicio</th>
+          <th>Suspendido</th>
+          <th>Suspendido por</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var i in Model.Suspendidos)
+        {
+          <tr>
+            <td>@i.ItemClinico?.Nombre</td>
+            <td>@i.ItemClinico?.Tipo</td>
+            <td>@i.FechaInicio.ToString("dd/MM/yyyy")</td>
+            <td>@i.FechaSuspension?.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@i.AutorSuspension?.Nombre</td>
+          </tr>
+        }
+        @if (!Model.Suspendidos.Any())
+        {
+          <tr>
+            <td colspan="5" class="text-muted text-center">No hay registros suspendidos.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @* ---------- Exámenes ---------- *@
+  <div class="tab-pane fade" id="tab-examenes">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Resultados de exámenes</h5>
+      <a class="btn btn-primary btn-sm" href="/Examenes/Index?mascotaId=@m.Id">Registrar o ver exámenes</a>
+    </div>
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Descripción</th>
+          <th>Archivo</th>
+          <th>Fecha</th>
+          <th>Registrado por</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var e in Model.Examenes)
+        {
+          <tr>
+            <td>@e.Descripcion</td>
+            <td><a href="/Examenes/Descargar/@e.Id" target="_blank" rel="noopener">@e.NombreOriginal</a></td>
+            <td>@e.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@e.Autor?.Nombre</td>
+          </tr>
+        }
+        @if (!Model.Examenes.Any())
+        {
+          <tr>
+            <td colspan="4" class="text-muted text-center">Sin exámenes registrados.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @* ---------- Historial clínico ---------- *@
+  <div class="tab-pane fade" id="tab-historial">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Últimas notas</h5>
+      <a class="btn btn-primary btn-sm" href="/Notas/Index?mascotaId=@m.Id">Ver historial y agregar nota</a>
+    </div>
+    @foreach (var n in Model.Notas)
+    {
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between">
+          <span>@n.FechaHora.ToString("dd/MM/yyyy HH:mm")</span>
+          <small class="text-muted">@n.Autor?.Nombre</small>
+        </div>
+        <div class="card-body">@Html.Raw(n.ContenidoHtml)</div>
+      </div>
+    }
+    @if (!Model.Notas.Any())
+    {
+      <p class="text-muted text-center">Sin notas en el historial.</p>
+    }
+  </div>
+
+</div>

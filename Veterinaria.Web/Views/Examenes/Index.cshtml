@@ -1,0 +1,63 @@
+@* Formulario para registrar un examen y listado de los exámenes de la mascota,  *@
+@model Veterinaria.Web.ViewModels.ExamenesVM
+@{ ViewData["Title"] = "Exámenes"; }
+
+<a href="/Mascotas/Expediente/@Model.Mascota.Id" class="btn btn-link ps-0">&larr; Volver al expediente</a>
+<h2>Exámenes de @Model.Mascota.Nombre</h2>
+
+<form asp-action="Crear" method="post" enctype="multipart/form-data" class="card card-body mb-4">
+  <input type="hidden" asp-for="Form.MascotaId" />
+  <div class="row g-3">
+    <div class="col-md-5">
+      <label class="form-label">Descripción</label>
+      <input asp-for="Form.Descripcion" class="form-control" placeholder="Ej.: Hemograma completo" />
+      <span asp-validation-for="Form.Descripcion" class="text-danger"></span>
+    </div>
+    <div class="col-md-5">
+      <label class="form-label">Archivo (imagen o PDF, máx. 5 MB)</label>
+      <input type="file" name="archivo" class="form-control" accept=".jpg,.jpeg,.png,.pdf" />
+      @Html.ValidationMessage("archivo", new { @class = "text-danger" })
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button class="btn btn-primary w-100">Registrar</button>
+    </div>
+  </div>
+</form>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th>Descripción</th>
+        <th>Archivo</th>
+        <th>Registrado</th>
+        <th>Registrado por</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    @foreach (var e in Model.Examenes)
+    {
+      <tr>
+        <td>@e.Descripcion</td>
+        <td>
+          <span class="badge @(e.TipoContenido == "application/pdf" ? "bg-danger" : "bg-info text-dark")">
+            @(e.TipoContenido == "application/pdf" ? "PDF" : "Imagen")
+          </span>
+          @e.NombreOriginal
+        </td>
+        <td>@e.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+        <td>@e.Autor?.Nombre</td>
+        <td class="text-end text-nowrap">
+          <a class="btn btn-sm btn-outline-primary" href="/Examenes/Descargar/@e.Id" target="_blank" rel="noopener">Ver</a>
+          <a class="btn btn-sm btn-outline-secondary" href="/Examenes/Descargar/@e.Id?descargar=true">Descargar</a>
+        </td>
+      </tr>
+    }
+    @if (!Model.Examenes.Any())
+    {
+      <tr><td colspan="5" class="text-muted text-center">Sin exámenes registrados.</td></tr>
+    }
+    </tbody>
+  </table>
+</div>

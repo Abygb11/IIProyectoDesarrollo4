@@ -15,8 +15,12 @@ public class HomeController : Controller
 
     public HomeController(AppDbContext db) => _db = db;
 
+    // Veterinarios y administradores van directo al listado de mascotas al iniciar sesión.
     public async Task<IActionResult> Index()
     {
+        if (User.IsInRole("Administrador") || User.IsInRole("Veterinario"))
+            return RedirectToAction("Index", "Mascotas");
+
         if (User.IsInRole(nameof(Perfil.Dueno)))
         {
             var usuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

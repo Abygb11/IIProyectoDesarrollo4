@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(o =>
     
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<AtencionService>();
+builder.Services.AddScoped<ArchivoService>();
 
 //el esquema es un identificador que se le da a la autenticación, en este caso se le da el nombre Bearer,
 // que es el esquema que se usa para los tokens JWT
