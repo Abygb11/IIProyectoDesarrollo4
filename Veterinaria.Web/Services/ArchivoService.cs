@@ -35,7 +35,7 @@ public class ArchivoService
 
     private string CarpetaExamenes => Path.Combine(_env.ContentRootPath, "App_Data", "examenes");
 
-    // Fotos (veterinarios, mascotas), que se guardan en wwwroot/uploads/<carpeta>
+    // Fotos (veterinarios, mascotas), que se guardan en wwwroot/uploads/
     public Task<ResultadoArchivo> GuardarFotoAsync(IFormFile? archivo, string carpeta)
         => GuardarAsync(archivo, TiposImagen,
             Path.Combine(_env.WebRootPath, "uploads", carpeta),
