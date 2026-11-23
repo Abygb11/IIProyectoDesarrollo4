@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../config.dart';
+import '../estilos/estilos.dart';
 import '../models/mascota.dart';
 import '../services/api_service.dart';
 
@@ -13,7 +14,9 @@ class FotoMascota extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipOval(
+    // Cuadro con esquinas redondeadas (no circulo)
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(tamano * 0.3),
       child: SizedBox(
         width: tamano,
         height: tamano,
@@ -34,8 +37,8 @@ class FotoMascota extends StatelessWidget {
   // Ícono que reemplaza la foto.
   Widget _icono() {
     return Container(
-      color: Colors.teal.shade50,
-      child: Icon(Icons.pets, size: tamano * 0.5, color: Colors.teal),
+      color: Estilos.fondoIcono,
+      child: Icon(Estilos.iconoAnimal, size: tamano * 0.5, color: Estilos.primario),
     );
   }
 }

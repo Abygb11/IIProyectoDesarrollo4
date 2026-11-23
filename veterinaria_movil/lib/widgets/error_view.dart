@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../estilos/estilos.dart';
 import '../services/errores.dart';
 
 // Texto para mostrarle al usuario según el tipo de error.
@@ -62,7 +63,7 @@ class _ErrorViewState extends State<ErrorView> {
             Icon(
               sinConexion ? Icons.wifi_off : Icons.error_outline,
               size: 64,
-              color: Colors.grey,
+              color: Estilos.gris,
             ),
             const SizedBox(height: 16),
             Text(
